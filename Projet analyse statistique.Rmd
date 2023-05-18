@@ -1,0 +1,501 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# 1 Importation et exploration des données R
+
+Dans ce projet nous allons travailler sur le jeu de données heart nommé **db**
+<https://esb-schoolofbusiness.tn/moodle/pluginfile.php/58459/mod_resource/content/0/heart.txt>
+
+## 1.1 Importer le jeu de données “db”
+
+```{r}
+db=read.table("db.txt", header=TRUE, sep = "\t", dec=".")
+View(db)
+```
+
+Installer ggplot
+
+```{r}
+
+library(ggplot2)
+```
+
+
+## 1.2 Décrire les variables
+
+```{r}
+colnames(db)
+```
+Ce jeu de données contienne 13 variables.
+
+### Types des variables
+
+
+```{r}
+str(db)
+```
+Interprétation:
+
+la variable du colonne 11 est quantitative discret
+les variables des colonnes 1,4,5,8,10 sont quantitatives continues
+les variables des colonnes 2,3,6,7,9,12,13 sont des variables qualitatives
+
+Ce jeu de données contienne des informations sur la santé cardiaque de différentes personnes, avec des variables telles que l'âge, le genre, la pression, le taux de cholestérol et le taux de sucre dans le sang. Il y a également des variables qui indiquent si les personnes ont déjà eu de l'angine ou des problèmes cardiaques, ainsi que des variables qui mesurent le rythme cardiaque et le niveau de dépression.
+
+
+### Les modalités
+
+```{r}
+levels(db$sexe)
+levels(db$type_douleur)
+levels(db$sucre)
+levels(db$electro)
+levels(db$angine)
+levels(db$vaisseau)
+levels(db$coeur)
+```
+
+
+## 1.3 Missing values
+
+
+```{r}
+is.na(db)
+```
+Le résultat affiche 'false' donc il n' y a pas de valeurs manquantes dans le jeu de données 'db'
+
+# 2 Etude des variables « electro et coeur» variable qualitative
+
+## 2.1  Les modalités et l'effectif des variables
+
+On doit changer le type des variables quantitative en as factor
+
+```{r}
+for (i in c(2,3,6,7,9,11,12,13) ) 
+{
+  db[,i]=as.factor(db[,i])
+}
+```
+
+### Le type des variables
+
+```{r}
+str(db)
+```
+
+
+### Modalités et effectif de chacune des variables
+
+Electro
+
+```{r}
+
+levels(db$electro)
+nlevels(db$electro)
+eff_electro=table(db$electro)
+eff_electro
+
+```
+Coeur
+
+
+```{r}
+levels(db$coeur)
+nlevels(db$coeur)
+eff_coeur=table(db$coeur)
+eff_coeur
+
+```
+
+
+
+
+## 2.2 La fréquence relative de chacune de ces variables
+
+```{r}
+N=nrow(db)
+freq_electro=prop.table(table(db$electro))
+freq_coeur=prop.table(table(db$coeur))
+freq_electro
+freq_coeur
+
+```
+
+
+## 2.3 Réprésentation Graphique
+
+Diagramme en batons  barplot 
+
+```{r}
+
+par(mfrow= c(1,2))
+bardb1=table(db$coeur, db$electro)
+pie(bardb1, main = "Repartition du coeur en fonction \n de electro")
+barplot(bardb1, legend = rownames(bardb1))
+```
+
+Pour étudier le croisement entre ces deux variables : 
+Nous avons examiné les fréquences d’occurrences des différentes combinaisons de “coeur” et “électro”. 
+Le graphique montre au niveau de la combinaison C qu’une tranche importante de la population possède une maladie de coeur ceci s’explique par le résultat d’électrographie qui montre une hypertrophie ventriculaire gauche probable pour la plupart de la population.
+On note que la tanche est plus importante que la tranche A dont le résultat d’electrographique “A” est normal donc on conclut que la majorité de la population n’a pas une maladie du coeur.
+La tranche B n’est pas assez fréquente donc on ne peut pas analyser le croisement.
+
+
+## 2.4 Le croisement entre ces deux variables
+
+```{r}
+ggplot(db, aes(x = coeur, fill = electro)) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = c("A" = "red", "B" = "blue", "C" = "green"))
+
+```
+
+## 2.6  Le test Khi-2
+
+
+```{r}
+chisq.test(bardb1)
+```
+Interpretation
+
+Le test du chi-deux est une technique statistique utilisée pour évaluer s'il existe une différence significative entre les proportions de plusieurs groupes.
+
+On a le p-value = 0.01 est inférieur à 0.05, donc l'H0 : il existe une différence significative entre les 2 variables coeur et electro et lien statistique important donc il y a une différence significative , on conclu que les variables sont indépendantes l'une de l'autre donc ils varient dans le sens opposé
+
+# 3  Etude des variables « age et cholesterol » variable quantitative
+
+## 3.1  Moyenne, médiane, quartile, min, max de l'age et cholesterol
+
+```{r}
+summary(db$age)
+```
+
+
+
+```{r}
+summary(db$cholester)
+```
+
+
+
+## 3.2 Etendu, variance et ecart type
+
+Etendu
+
+```{r}
+
+E_age=(max(db$age)-min(db$age))
+E_cholester=( max(db$cholester)-min(db$cholester))
+E_age
+E_cholester
+```
+variance
+
+```{r}
+var(db$age)
+var(db$cholester)
+```
+
+l'ecart type
+
+```{r}
+sd(db$age)
+sd(db$cholester)
+```
+Coefficient de variation
+
+```{r}
+(sd(db$age)/ mean(db$age)) * 100
+(sd(db$cholester)/ mean(db$cholester)) * 100
+
+```
+Interpretation 
+
+Le coefficient de variation de la variable age est de 16,7%, ce qui signifie que la variable age est assez homogène, car elle n'est pas très dispersée autour de sa moyenne.
+
+Le coefficient de variation de la variable cholester est de 20,7%, ce qui signifie que cette variable est plus dispersée autour de sa moyenne que la variable age. Cela peut indiquer que la variable cholester est moins homogène que la variable age.
+
+
+## 3.3 Boxplot
+
+```{r}
+
+ggplot(db)+
+  aes(x = cholester, y= age, fill= sexe)+
+  geom_boxplot()
+  
+```
+Interpretation:
+
+Ce graphe est un diagramme en boîte, qui représente la distribution de la variable "age" en fonction de la variable "cholestérol". Chaque boîte représente la distribution des valeurs de la variable "âge" pour les individus d'un sexe donné. La boîte elle-même indique les quartiles de la distribution, tandis que la "tige" qui s'étend de chaque boîte indique l'étendue de la distribution.
+En regardant le graphe, on peut voir que les distributions de l'âge pour les deux sexes sont assez similaires, avec des médianes autour de 55 ans et des quartiles inférieurs et supérieurs autour de 48 et 61 ans respectivement. On peut également voir que la distribution de l'âge pour les femmes semble légèrement plus concentrée que celle des hommes, avec une étendue de valeurs un peu plus réduite.
+
+En ce qui concerne la dispersion des observations de la variable "cholestérol", on peut voir que la médiane est de 245 mg/dL et que la moyenne est de 249,7 mg/dL. Cela signifie que la plupart des individus ont environ 245 mg/dL de cholestérol. On peut également voir que l'étendue de la distribution du cholestérol est de 126 à 564 mg/dL, ce qui signifie que les individus ont des taux de cholestérol allant de 126 à 564 mg/dL. L'intervalle interquartile est de 213 à 280 mg/dL, ce qui indique que la plupart des individus ont des taux de cholestérol compris entre ces deux valeurs.
+
+En résumé, la distribution de l'âge et du cholestérol dans cet échantillon semble avoir une tendance centrale assez proche de la médiane, mais une dispersion relativement élevée, avec des valeurs extrêmes s'étendant au-delà de l'intervalle interquartile. Cela peut indiquer que, bien que la plupart des individus aient des âges et des taux de cholestérol proches de la médiane, il y a un certain nombre d'individus ayant des âges et des taux de cholestérol significativement différents de la plupart des autres.
+
+
+## 3.4 Regrouper la variable âge en classes d’âges
+
+
+```{r}
+
+ggplot(db)+
+  aes(x = age , y = after_stat(count)/ after_stat(width))+
+  geom_histogram(breaks=c(29,seq(30,75,by=5),77), fill="orange", color="black")
+
+
+```
+
+## 3.4 Effectif a chaque classe
+
+
+```{r}
+eff_classe=table(db$age)
+eff_classe
+```
+
+
+
+## 3.5 La covariance et la coorelation entre les deux variables
+
+
+covariance
+
+```{r}
+cov(db$age,db$cholester)
+```
+la correlation
+
+```{r}
+cor(db$age,db$cholester)
+
+```
+
+## 3.6 Le nuage de point: scatter plot
+
+
+```{r}
+
+ggplot(db)+aes(x=age,y=cholester,color=sexe)+geom_point()+
+scale_color_manual(values=c("masculin"="green","feminin"="red"))
+
+```
+
+
+Interpretation :
+
+Le graphique ci-dessus crée un graphique à nuages de points qui représente la relation entre les variables "âge" et "cholestérol" dans l'échantillon. Les points sont colorés en fonction du sexe de l'individu.
+
+En regardant ce graphique, on peut voir qu'il y a une relation assez faible entre l'âge et le cholestérol. On peut voir que les points sont relativement dispersés sur le graphique, ce qui indique que les valeurs de l'âge et du cholestérol ne sont pas très corrélées.
+
+Le coefficient de corrélation est un indicateur qui mesure la force et la direction de la relation entre deux variables. Un coefficient de corrélation de 0 indique qu'il n'y a pas de relation entre les variables, tandis qu'un coefficient de corrélation de 1 ou -1 indique une relation forte. Dans ce cas, le coefficient de corrélation entre l'âge et le cholestérol est de 0,22, ce qui indique une relation positive assez faible entre ces deux variables.
+
+Pour résumer, de point de vue visiuel le graphique ne montre pas un modèle linéaire.
+
+
+## 3.7 Un modèle linéaire simple
+
+
+
+```{r}
+model_lin=lm(cholester~age, db)
+model_lin
+
+```
+
+
+```{r}
+summary(model_lin)
+```
+
+## 3.8 Interprétation
+
+Le modèle linéaire simple créé ci-dessus est une régression linéaire qui essaie de prédire la variable "cholestérol" en fonction de la variable "âge". en créant ce modèle en spécifiant la variable cible (cholestérol) et la variable explicative (âge).
+
+L'équation de droite est de la forme y = ax + b, où "a" est le coefficient de la variable explicative (âge) et "b" est l'intercept. Dans ce cas, le coefficient de la variable explicative est de 1,25 et l'intercept est de 181,69. Cela signifie que, selon le modèle, pour chaque année d'âge supplémentaire, le cholestérol augmente de 1,25 mg/dL.
+
+On peut également voir que le modèle a un coefficient de détermination (R²) de 0,048, ce qui signifie que seulement 4,8% de la variance de la variable cible (cholestérol) peut être expliquée par la variable explicative (âge). Cela indique que la relation entre ces deux variables est assez faible et que le modèle n'est pas très précis pour prédire le cholestérol en fonction de l'âge.
+
+En résumé, ce modèle linéaire simple montre qu'il y a une relation faible entre l'âge et le cholestérol.
+
+
+## 3.9 Afficher les coefficients de ce modèle
+
+```{r}
+coef(model_lin)
+
+```
+
+
+```{r}
+beta0=coef(model_lin)[1]
+beta0
+beta1=coef(model_lin)[2]
+beta1
+```
+
+
+```{r}
+eq= paste("age~", round(beta0,3),round(beta1,3),"*cholester")
+eq
+```
+## 3.10 Ajouter la ligne de ce modèle sur le graphique du nuage de points
+
+```{r}
+plot(y = db$cholester, x=db$age,
+     main="Relation entre cholesterol et age ",
+     xlab = "Age", 
+     ylab = "Cholesterol", col="blue")
+abline(model_lin,col=2,lwd=2)
+```
+
+# 4 Etude des variables « type_douleur et pression» 
+
+## 4.1 Calculer les indicateurs statistiques usuels de la variable quantitative pression
+
+```{r}
+summary(db$pression)
+```
+
+mode
+
+
+```{r}
+names(which.max(table(db$pression)))
+```
+
+## 4.2 Représenter graphiquement
+
+### Première représentation graphique : Boxplot
+
+```{r}
+
+ggplot(db, aes(x = pression)) +
+  geom_boxplot(fill = "skyblue", color = "black")
+
+```
+
+
+### Deuxième représentation graphique : Histogramme
+
+```{r}
+ggplot(db)+
+  aes(x = pression )+
+  geom_histogram(bins = 20, binwidth = 5, fill="red", color="black")
+  
+```
+
+Interpretation:
+
+En regardant l'histogramme, on peut voir que la plupart des valeurs de la pression se situent dans une fourchette allant de 120 à 140 mmHg, avec une concentration plus importante de valeurs autour de 130 mmHg. On peut également voir que la distribution de la pression a une forme assez symétrique, avec des pics de densité autour de 120 mmHg et de 130 mmHg.
+
+
+## 4.3 Calculer la moyenne de la variable quantitative pression pour chaque groupe (modalité) de la variable type_douleur
+
+```{r}
+tapply(db$pression,db$type_douleur, mean)
+```
+Interprétation
+
+Selon le résultat, on peut voir que la moyenne de la pression  est la plus élevée pour les individus appartenant à la catégorie A (141,30) et la plus faible pour ceux appartenant à la catégorie B (128,26). Les moyennes de la pression  pour les catégories C et D sont respectivement de 129,56 et 131,90.
+En comparant ces moyennes, on peut en déduire que la pression moyenne est plus élevée pour les individus appartenant à la catégorie A que pour ceux appartenant aux autres catégories. Cela peut indiquer qu'il y a une relation entre le type de douleur et la pression, avec une pression plus élevée pour les individus ayant une douleur de type A
+
+
+## 4.4  Représenter graphiquement la relation pression sur la base de type_douleur
+
+boxplot
+
+```{r}
+ggplot(db, aes(x = type_douleur, y = pression, fill = sexe)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("feminin" = "pink", "masculin" = "blue"))
+
+```
+
+## 4.5 Le test ANOVA
+
+
+```{r}
+test1= aov(db$pression ~ db$type_douleur)
+summary(test1)
+```
+
+Iterprétation 
+
+Le test ANOVA (Analyse de la variance) est une technique statistique utilisée pour comparer les moyennes de plusieurs groupes. Le test ANOVA créé ci-dessus essaie de comparer les moyennes de la variable "pression" entre les différentes catégories de la variable "type_douleur".
+
+Le résultat du test ANOVA est présenté ci-dessus. On peut voir que le test a trouvé une différence significative entre les moyennes de la pression selon le type de douleur (p-value de 0,0378). Cela signifie qu'il y a une différence statistiquement significative entre les moyennes de la pression pour les différentes catégories de type de douleur.
+
+# 5 Modélisation linéaire de la variable « pression en fonction de la variable cholesterol »
+
+## 5.1 Représentation Graphique 
+
+le scatter plot  permet de montrer le liens entre deux variables quantitatives
+
+```{r}
+
+ggplot(db)+aes(x=pression,y=cholester,color=sexe)+geom_point()+
+scale_color_manual(values=c("masculin"="blue","feminin"="yellow"))
+
+```
+
+Interpretation :
+
+Le graphique à nuages de points créé ci-dessus représente la relation entre les variables "pression" et "cholestérol" dans l'échantillon. Les points sont colorés en fonction du sexe de l'individu.
+
+En regardant ce graphique, on peut voir qu'il y a une relation assez faible entre la pression et le cholestérol. On peut voir que les points sont relativement dispersés sur le graphique, ce qui indique que les valeurs de la pression et du cholestérol ne sont pas très corrélées. On peut également voir que la relation entre ces deux variables n'est pas linéaire, car les points ne suivent pas une ligne droite sur le graphique.
+
+Ce graphique montre qu'il y a une relation faible entre la pression et le cholestérol, mais que cette relation n'est pas linéaire.
+
+
+
+## 5.2 Une régression linéaire
+
+```{r}
+model_lin2=lm(pression~cholester, db)
+model_lin2
+summary(model_lin2)
+```
+Interpretation:
+
+Le modèle de régression linéaire créé ci-dessus essaie de modéliser la relation entre la pression (variable dépendante) et le cholestérol (variable indépendante) dans l'échantillon. Le modèle est présenté ci-dessus avec ses coefficients et son résumé.
+
+Selon le résumé du modèle, on peut voir que le coefficient de la variable "cholestérol" est de 0,05979, ce qui signifie qu'une augmentation de 1 mg/dL de cholestérol est associée à une augmentation de 0,05979 mmHg de la pression. On peut également voir que ce coefficient est significatif (p-value de 0,00435), ce qui signifie qu'il y a une relation statistiquement significative entre la pression et le cholestérol.
+
+Le modèle a également un coefficient de détermination multiple (R²) de 0,02994, ce qui signifie que 2,99% de la variance de la pression peut être expliquée par la variable "cholestérol". Cela indique que la variable "cholestérol" ne peut expliquer qu'une faible partie de la variance de la pression.
+
+En résumé, on peut dire que le modèle de régression linéaire créé ci-dessus montre une relation faible et significative entre la pression et le cholestérol, mais que cette relation ne peut expliquer qu'une faible partie de la variance de la pression.
+
+
+## 5.3  Evaluation de la qualité de la modélisation
+
+```{r}
+beta0=coef(model_lin2)[1]
+beta0
+beta1=coef(model_lin2)[2]
+beta1
+```
+```{r}
+eq2=paste("pression~",round(beta0,3), round(beta1,3), "*cholester")
+eq2
+```
+
+## 5.4 La ligne de modèle sur le graphique du nuage de points 
+
+
+```{r}
+
+plot(y = db$pression, x=db$cholester,
+     main="Relation entre pression et cholesterol ",
+     xlab = "pression", 
+     ylab = "Cholesterol" , col = "blue")
+abline(model_lin2,col=2,lwd=2)
+```
+
+
+
