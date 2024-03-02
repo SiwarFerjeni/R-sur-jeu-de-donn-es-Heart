@@ -1,5 +1,6 @@
-# Projet d'Analyse Statistique avec R - Jeu de Données "Heart"
-Bienvenue dans le projet d'analyse statistique avec R, centré sur le jeu de données "Heart" ! L'objectif de ce projet est d'appliquer l'ensemble des connaissances acquises en analyse statistique avec le langage de programmation R. Le jeu de données "Heart" servira de base pour explorer et appliquer différentes techniques d'analyse statistique.
+Statistical Analysis Project with R - 'Heart' Dataset
 
-# À propos du Jeu de Données "Heart"
-Le jeu de données "Heart" est un ensemble de données qui comprend des informations sur des patients présentant des problèmes cardiaques. Il offre une opportunité d'appliquer diverses techniques d'analyse statistique pour comprendre les facteurs liés aux problèmes cardiaques et pour effectuer des prédictions.
+Welcome to the statistical analysis project with R, focused on the 'Heart' dataset! The goal of this project is to apply the knowledge acquired in statistical analysis using the R programming language. The 'Heart' dataset will serve as the foundation to explore and apply various statistical analysis techniques.
+
+About the 'Heart' Dataset
+The 'Heart' dataset is a collection of data containing information about patients with heart conditions. It provides an opportunity to apply various statistical analysis techniques to understand factors related to heart issues and make predictions.
